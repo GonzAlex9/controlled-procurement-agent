@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controlled Procurement Agent — Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #0d1726;
+      --panel-2: #111c2e;
+      --border: #23314a;
+      --text: #e8eef8;
+      --muted: #91a0b8;
+      --cyan: #22d3ee;
+      --violet: #8b5cf6;
+      --green: #34d399;
+      --amber: #f59e0b;
+      --red: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(34, 211, 238, 0.08), transparent 30%),
+        radial-gradient(circle at 15% 0%, rgba(139, 92, 246, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .shell {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 72px;
+    }
+
+    .hero {
+      padding: 30px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(17, 28, 46, 0.96), rgba(8, 18, 31, 0.96));
+      border-radius: 22px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 10px 0 8px;
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      max-width: 800px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .principle {
+      margin-top: 22px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--violet);
+      background: rgba(139, 92, 246, 0.08);
+      color: #d8cdfd;
+      border-radius: 8px;
+      font-weight: 650;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin: 18px 0 28px;
+    }
+
+    .stage {
+      min-height: 76px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: rgba(13, 23, 38, 0.9);
+      border-radius: 14px;
+    }
+
+    .stage span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stage strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .stage.active {
+      border-color: rgba(34, 211, 238, 0.55);
+      box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.12);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.45fr);
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(13, 23, 38, 0.92);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .card h2, .card h3 {
+      margin: 0 0 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 19px; }
+    .card h3 { font-size: 15px; color: #c9d5e7; }
+
+    .muted { color: var(--muted); }
+    .tiny { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .preset {
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .preset:hover { border-color: #465879; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      color: #bdc9dc;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    label.full { grid-column: 1 / -1; }
+
+    input, select, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 11px;
+      color: var(--text);
+      background: #081321;
+      border: 1px solid #263750;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(34, 211, 238, 0.7);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .checks label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 500;
+    }
+
+    .checks input {
+      width: auto;
+      margin: 0;
+    }
+
+    .primary {
+      width: 100%;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 11px;
+      color: #061018;
+      background: linear-gradient(90deg, var(--cyan), var(--green));
+      font-weight: 800;
+    }
+
+    .primary:disabled { opacity: 0.55; cursor: wait; }
+
+    .error {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.08);
+      color: #fecaca;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .results {
+      display: grid;
+      gap: 18px;
+    }
+
+    .empty {
+      min-height: 410px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #30415d;
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .decision-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .badge.auto_approve {
+      background: rgba(52, 211, 153, 0.12);
+      color: #86efac;
+      border: 1px solid rgba(52, 211, 153, 0.28);
+    }
+
+    .badge.human_review {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+    }
+
+    .badge.reject {
+      background: rgba(248, 113, 113, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(248, 113, 113, 0.28);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .stat {
+      padding: 12px;
+      border-radius: 12px;
+      background: #081321;
+      border: 1px solid #22334c;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .list li {
+      padding: 10px 11px;
+      border-radius: 10px;
+      background: #081321;
+      border: 1px solid #22334c;
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .approval-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+
+    .approval {
+      padding: 12px;
+      border: 1px solid #2a3a53;
+      border-radius: 12px;
+      background: #081321;
+    }
+
+    .approval strong {
+      display: block;
+      margin-bottom: 9px;
+      text-transform: capitalize;
+    }
+
+    .approval button {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.08);
+      color: #86efac;
+      border-radius: 9px;
+      font-weight: 700;
+    }
+
+    .approval button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .audit {
+      display: grid;
+      gap: 8px;
+    }
+
+    .event {
+      padding: 10px 12px;
+      border-left: 3px solid #526681;
+      background: #081321;
+      border-radius: 8px;
+    }
+
+    .event strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .event span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      color: #667892;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .pipeline { grid-template-columns: repeat(3, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 20px, 1220px); padding-top: 16px; }
+      .hero { padding: 22px; }
+      .pipeline, .stats, .presets, .form-grid { grid-template-columns: 1fr; }
+      label.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">Enterprise Agentic AI Demo</div>
+      <h1>Controlled Procurement Agent</h1>
+      <p>
+        Explore how an AI analyst can add reasoning to a procurement workflow while
+        deterministic policy and human approval retain business authority.
+      </p>
+      <div class="principle">
+        The agent can reason about a purchase. It cannot authorize one.
+      </div>
+    </section>
+
+    <section class="pipeline" aria-label="Workflow stages">
+      <div class="stage active"><span>01</span><strong>Purchase request</strong></div>
+      <div class="stage"><span>02</span><strong>Enterprise context</strong></div>
+      <div class="stage"><span>03</span><strong>Policy engine</strong></div>
+      <div class="stage"><span>04</span><strong>AI / deterministic analysis</strong></div>
+      <div class="stage"><span>05</span><strong>Human gate</strong></div>
+      <div class="stage"><span>06</span><strong>Audit trail</strong></div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>Purchase request</h2>
+        <p class="tiny">
+          All vendors, budgets and policies in this demo are fictional.
+          Start with a preset or modify the request.
+        </p>
+
+        <div class="presets">
+          <button class="preset" data-preset="low">Low risk</button>
+          <button class="preset" data-preset="review">Human review</button>
+          <button class="preset" data-preset="reject">Policy reject</button>
+        </div>
+
+        <form id="request-form">
+          <div class="form-grid">
+            <label>
+              Request ID
+              <input id="request-id" value="PR-DEMO-001" required />
+            </label>
+
+            <label>
+              Requester
+              <input id="requester" value="demo.user" required />
+            </label>
+
+            <label>
+              Department
+              <select id="department">
+                <option>IT</option>
+                <option>Operations</option>
+                <option>Marketing</option>
+              </select>
+            </label>
+
+            <label>
+              Category
+              <select id="category">
+                <option value="hardware">Hardware</option>
+                <option value="saas" selected>SaaS</option>
+                <option value="services">Services</option>
+                <option value="cloud">Cloud</option>
+              </select>
+            </label>
+
+            <label>
+              Vendor
+              <select id="vendor-id">
+                <option value="vendor-cloud">CloudWorks Europe — approved</option>
+                <option value="vendor-ai" selected>Agent Labs — review</option>
+                <option value="vendor-legacy">Legacy Services Ltd — blocked</option>
+              </select>
+            </label>
+
+            <label>
+              Amount EUR
+              <input id="amount" type="number" min="1" step="100" value="7500" />
+            </label>
+
+            <label>
+              Quotes supplied
+              <input id="quotes" type="number" min="0" value="2" />
+            </label>
+
+            <label class="full">
+              Business justification
+              <textarea id="justification">Agentic workflow platform for a controlled enterprise pilot.</textarea>
+            </label>
+          </div>
+
+          <div class="checks">
+            <label><input id="personal-data" type="checkbox" checked /> Personal data</label>
+            <label><input id="recurring" type="checkbox" /> Recurring spend</label>
+            <label><input id="emergency" type="checkbox" /> Emergency</label>
+            <label><input id="use-ai" type="checkbox" /> Use OpenAI analyst</label>
+          </div>
+
+          <button class="primary" id="analyze" type="submit">Analyze purchase request</button>
+          <div class="error" id="error"></div>
+
+          <p class="tiny">
+            AI mode requires <code>OPENAI_API_KEY</code>. Deterministic mode is fully
+            runnable offline and is the default.
+          </p>
+        </form>
+      </div>
+
+      <div class="results" id="results">
+        <div class="empty">
+          <div>
+            <h2>Run a scenario</h2>
+            <p>
+              The result will show enterprise context, deterministic policy,
+              the analyst narrative, approval state and audit events.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Portfolio demo · No production systems, company policies or real purchasing data.
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("request-form");
+    const results = document.getElementById("results");
+    const errorBox = document.getElementById("error");
+    const analyzeButton = document.getElementById("analyze");
+
+    const presets = {
+      low: {
+        id: "PR-DEMO-LOW",
+        department: "IT",
+        category: "hardware",
+        vendor: "vendor-cloud",
+        amount: 800,
+        quotes: 1,
+        personalData: false,
+        justification: "Replacement monitor for an engineering workstation."
+      },
+      review: {
+        id: "PR-DEMO-REVIEW",
+        department: "IT",
+        category: "saas",
+        vendor: "vendor-ai",
+        amount: 7500,
+        quotes: 2,
+        personalData: true,
+        justification: "Agentic workflow platform for a controlled enterprise pilot."
+      },
+      reject: {
+        id: "PR-DEMO-REJECT",
+        department: "IT",
+        category: "services",
+        vendor: "vendor-legacy",
+        amount: 900,
+        quotes: 1,
+        personalData: false,
+        justification: "Specialist support services for a legacy integration."
+      }
+    };
+
+    const value = (id) => document.getElementById(id).value;
+    const checked = (id) => document.getElementById(id).checked;
+
+    function setStages(activeCount) {
+      document.querySelectorAll(".stage").forEach((node, index) => {
+        node.classList.toggle("active", index < activeCount);
+      });
+    }
+
+    function text(tag, content, className = "") {
+      const node = document.createElement(tag);
+      node.textContent = content;
+      if (className) node.className = className;
+      return node;
+    }
+
+    function clear(node) {
+      while (node.firstChild) node.removeChild(node.firstChild);
+    }
+
+    function makeCard(title) {
+      const card = document.createElement("section");
+      card.className = "card";
+      card.appendChild(text("h2", title));
+      return card;
+    }
+
+    function renderList(container, items, emptyText) {
+      const list = document.createElement("ul");
+      list.className = "list";
+      if (!items.length) {
+        list.appendChild(text("li", emptyText));
+      } else {
+        items.forEach((item) => list.appendChild(text("li", item)));
+      }
+      container.appendChild(list);
+    }
+
+    async function fetchJson(url, options) {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Request failed");
+      }
+      return data;
+    }
+
+    function requestPayload() {
+      return {
+        id: value("request-id"),
+        requester: value("requester"),
+        department: value("department"),
+        category: value("category"),
+        vendor_id: value("vendor-id"),
+        amount_eur: Number(value("amount")),
+        justification: value("justification"),
+        quotes_count: Number(value("quotes")),
+        contains_personal_data: checked("personal-data"),
+        recurring: checked("recurring"),
+        emergency: checked("emergency")
+      };
+    }
+
+    function contextCard(analysis) {
+      const card = makeCard("Enterprise context");
+      const stats = document.createElement("div");
+      stats.className = "stats";
+
+      const vendor = document.createElement("div");
+      vendor.className = "stat";
+      vendor.appendChild(text("span", "Vendor"));
+      vendor.appendChild(text("strong", analysis.vendor ? analysis.vendor.name : "Unknown"));
+
+      const status = document.createElement("div");
+      status.className = "stat";
+      status.appendChild(text("span", "Vendor status"));
+      status.appendChild(
+        text("strong", analysis.vendor ? analysis.vendor.status : "not in master")
+      );
+
+      const budget = document.createElement("div");
+      budget.className = "stat";
+      budget.appendChild(text("span", "Budget remaining"));
+      budget.appendChild(
+        text(
+          "strong",
+          analysis.budget
+            ? "€" + analysis.budget.remaining_eur.toLocaleString()
+            : "Unavailable"
+        )
+      );
+
+      stats.append(vendor, status, budget);
+      card.appendChild(stats);
+      return card;
+    }
+
+    function policyCard(analysis) {
+      const card = makeCard("Deterministic policy");
+      const row = document.createElement("div");
+      row.className = "decision-row";
+      row.appendChild(text("span", "Authoritative decision", "muted"));
+      row.appendChild(text("span", analysis.policy.decision, "badge " + analysis.policy.decision));
+      card.appendChild(row);
+
+      card.appendChild(text("h3", "Findings"));
+      renderList(
+        card,
+        analysis.policy.findings.map(
+          (finding) => "[" + finding.severity + "] " + finding.message
+        ),
+        "No policy findings."
+      );
+
+      card.appendChild(text("h3", "Required approvals"));
+      renderList(
+        card,
+        analysis.policy.required_approvals,
+        "No human approval required."
+      );
+
+      return card;
+    }
+
+    function narrativeCard(analysis) {
+      const card = makeCard("Analyst narrative");
+      card.appendChild(text("p", analysis.narrative.summary, "muted"));
+
+      card.appendChild(text("h3", "Risks"));
+      renderList(card, analysis.narrative.risks, "No additional risks surfaced.");
+
+      card.appendChild(text("h3", "Evidence"));
+      renderList(card, analysis.narrative.evidence, "No evidence returned.");
+
+      card.appendChild(text("h3", "Next step"));
+      renderList(card, [analysis.narrative.next_step], "");
+
+      const mode = text("p", "Analysis mode: " + analysis.analysis_mode, "tiny");
+      card.appendChild(mode);
+      return card;
+    }
+
+    async function approvalCard(analysis) {
+      if (analysis.policy.decision !== "human_review") return null;
+
+      const card = makeCard("Human approval gate");
+      const state = await fetchJson("/v1/approvals/" + encodeURIComponent(analysis.request.id));
+      const status = text("p", "Gate status: " + state.status, "muted");
+      card.appendChild(status);
+
+      const grid = document.createElement("div");
+      grid.className = "approval-grid";
+
+      state.required.forEach((role) => {
+        const item = document.createElement("div");
+        item.className = "approval";
+        item.appendChild(text("strong", role));
+
+        const granted = state.granted.includes(role);
+        const button = text(
+          "button",
+          granted ? "Approved" : "Approve as " + role
+        );
+        button.disabled = granted || state.status !== "pending";
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await fetchJson(
+              "/v1/approvals/" + encodeURIComponent(analysis.request.id),
+              {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                  role,
+                  actor: role + ".reviewer@demo.local",
+                  approved: true,
+                  note: "Approved from the portfolio demo UI."
+                })
+              }
+            );
+            await renderAnalysis(analysis);
+          } catch (error) {
+            showError(error.message);
+          }
+        });
+        item.appendChild(button);
+        grid.appendChild(item);
+      });
+
+      card.appendChild(grid);
+      return card;
+    }
+
+    async function auditCard(requestId) {
+      const card = makeCard("Audit trail");
+      const events = await fetchJson("/v1/audit/" + encodeURIComponent(requestId));
+      const audit = document.createElement("div");
+      audit.className = "audit";
+
+      if (!events.length) {
+        audit.appendChild(text("p", "No events yet.", "muted"));
+      }
+
+      events.forEach((event) => {
+        const item = document.createElement("div");
+        item.className = "event";
+        item.appendChild(text("strong", event.event_type));
+        item.appendChild(text("span", new Date(event.occurred_at).toLocaleString()));
+        audit.appendChild(item);
+      });
+
+      card.appendChild(audit);
+      return card;
+    }
+
+    async function renderAnalysis(analysis) {
+      clear(results);
+      results.appendChild(contextCard(analysis));
+      results.appendChild(policyCard(analysis));
+      results.appendChild(narrativeCard(analysis));
+
+      const approvals = await approvalCard(analysis);
+      if (approvals) results.appendChild(approvals);
+
+      results.appendChild(await auditCard(analysis.request.id));
+      setStages(6);
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.style.display = "block";
+    }
+
+    function hideError() {
+      errorBox.textContent = "";
+      errorBox.style.display = "none";
+    }
+
+    document.querySelectorAll("[data-preset]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const preset = presets[button.dataset.preset];
+        document.getElementById("request-id").value = preset.id;
+        document.getElementById("department").value = preset.department;
+        document.getElementById("category").value = preset.category;
+        document.getElementById("vendor-id").value = preset.vendor;
+        document.getElementById("amount").value = preset.amount;
+        document.getElementById("quotes").value = preset.quotes;
+        document.getElementById("personal-data").checked = preset.personalData;
+        document.getElementById("justification").value = preset.justification;
+      });
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      hideError();
+      analyzeButton.disabled = true;
+      analyzeButton.textContent = "Analyzing…";
+      setStages(2);
+
+      try {
+        const useAi = checked("use-ai");
+        const analysis = await fetchJson(
+          "/v1/purchase-requests/analyze?use_ai=" + String(useAi),
+          {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(requestPayload())
+          }
+        );
+        await renderAnalysis(analysis);
+      } catch (error) {
+        showError(error.message);
+        setStages(1);
+      } finally {
+        analyzeButton.disabled = false;
+        analyzeButton.textContent = "Analyze purchase request";
+      }
+    });
+  </script>
+</body>
+</html>
