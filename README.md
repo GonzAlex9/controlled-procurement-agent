@@ -6,7 +6,9 @@
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-API-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/OpenAI-Agents_SDK-111827?style=flat-square&logo=openai&logoColor=white" alt="OpenAI Agents SDK" />
-  <img src="https://img.shields.io/badge/Pattern-Human--in--the--Loop-6D28D9?style=flat-square" alt="Human in the loop" />\n  <a href="https://render.com/deploy?repo=https://github.com/GonzAlex9/controlled-procurement-agent"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" /></a>
+  <img src="https://img.shields.io/badge/Pattern-Human--in--the--Loop-6D28D9?style=flat-square" alt="Human in the loop" />
+  <a href="https://controlled-procurement-agent.onrender.com/demo"><img src="https://img.shields.io/badge/Live_Demo-Open-22C55E?style=flat-square&logo=render&logoColor=white" alt="Live Demo" /></a>
+  <a href="https://github.com/GonzAlex9/controlled-procurement-agent/actions/workflows/ci.yml"><img src="https://github.com/GonzAlex9/controlled-procurement-agent/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
 # Controlled Procurement Agent
@@ -16,6 +18,10 @@ A production-minded **agentic AI workflow for enterprise procurement**.
 A purchase request enters the system. An AI analyst can inspect read-only enterprise context through tools and explain the case — but **budget rules, vendor controls, approval thresholds and execution authority remain deterministic**.
 
 > **The agent can reason about a purchase. It cannot authorize one.**
+
+### ▶ [Try the live demo](https://controlled-procurement-agent.onrender.com/demo)
+
+Run the workflow in your browser with fictional enterprise data. No API key or setup required.
 
 This project is intentionally designed around a real enterprise concern: how to get value from agentic AI **without turning probabilistic model behavior into business authority**.
 
@@ -102,6 +108,8 @@ See [`src/procurement_agent/policy.py`](./src/procurement_agent/policy.py).
 
 ## Deployment
 
+**Public demo:** [controlled-procurement-agent.onrender.com/demo](https://controlled-procurement-agent.onrender.com/demo)
+
 The repository includes a `render.yaml` Blueprint for a reproducible public deployment:
 
 - Python 3.12
@@ -139,7 +147,9 @@ These require **no API key**.
 make run
 ```
 
-Open the interactive portfolio demo at `http://localhost:8000/demo` (or simply `http://localhost:8000/`).\n\nThe FastAPI docs remain available at `http://localhost:8000/docs`.
+Open the interactive portfolio demo at `http://localhost:8000/demo` (or simply `http://localhost:8000/`).
+
+The FastAPI docs remain available at `http://localhost:8000/docs`.
 
 ### 4. Analyze a request without an LLM
 
@@ -170,7 +180,19 @@ Then call the same endpoint with `?use_ai=true`.
 
 AI mode uses the **OpenAI Agents SDK** with read-only tools and structured output. SDK tracing can be used to inspect model calls and tool use.
 
-## Interactive demo\n\nThe built-in reviewer UI lets you run three representative scenarios without any frontend setup:\n\n- **Low risk** — approved vendor, available budget, no human approval required.\n- **Human review** — medium-risk vendor / higher spend / personal-data handling.\n- **Policy reject** — blocked vendor or other blocking condition.\n\nThe screen exposes the full decision path: enterprise context → deterministic policy → analyst narrative → human approval gate → audit trail. Human approvers can record approvals directly from the demo UI.\n\nThe UI is intentionally self-contained HTML/CSS/JavaScript served by FastAPI so the portfolio project remains easy to run and inspect.\n\n## Human approval example
+## Interactive demo
+
+The built-in reviewer UI lets you run three representative scenarios without any frontend setup:
+
+- **Low risk** — approved vendor, available budget, no human approval required.
+- **Human review** — medium-risk vendor / higher spend / personal-data handling.
+- **Policy reject** — blocked vendor or other blocking condition.
+
+The screen exposes the full decision path: enterprise context → deterministic policy → analyst narrative → human approval gate → audit trail. Human approvers can record approvals directly from the demo UI.
+
+The UI is intentionally self-contained HTML/CSS/JavaScript served by FastAPI so the portfolio project remains easy to run and inspect.
+
+## Human approval example
 
 If policy requires approval, the workflow creates an approval gate. A human role then records an explicit decision:
 
