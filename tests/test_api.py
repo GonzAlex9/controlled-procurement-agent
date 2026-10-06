@@ -57,4 +57,6 @@ def test_analyze_without_ai_is_reproducible():
 def test_demo_config_exposes_ai_capability_flag():
     response = client.get("/v1/demo/config")
     assert response.status_code == 200
-    assert isinstance(response.json()["ai_enabled"], bool)
+    data = response.json()
+    assert isinstance(data["ai_enabled"], bool)
+    assert isinstance(data["persistence_enabled"], bool)
