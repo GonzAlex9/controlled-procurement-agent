@@ -725,6 +725,40 @@
       return card;
     }
 
+    function telemetryCard(analysis) {
+      const card = makeCard("Execution telemetry");
+      const stats = document.createElement("div");
+      stats.className = "stats";
+
+      const entries = [
+        ["Trace ID", analysis.telemetry.trace_id],
+        ["Mode", analysis.telemetry.analysis_mode],
+        ["Total", analysis.telemetry.total_duration_ms.toFixed(3) + " ms"],
+        ["Policy", analysis.telemetry.policy_duration_ms.toFixed(3) + " ms"],
+        ["Analyst", analysis.telemetry.analyst_duration_ms.toFixed(3) + " ms"],
+        ["Findings", String(analysis.telemetry.findings_count)],
+        ["Approvals", String(analysis.telemetry.required_approvals_count)]
+      ];
+
+      entries.forEach(([label, value]) => {
+        const item = document.createElement("div");
+        item.className = "stat";
+        item.appendChild(text("span", label));
+        item.appendChild(text("strong", value));
+        stats.appendChild(item);
+      });
+
+      card.appendChild(stats);
+      card.appendChild(
+        text(
+          "p",
+          "The trace ID is copied into the audit event so execution telemetry and business audit history can be correlated.",
+          "tiny"
+        )
+      );
+      return card;
+    }
+
     async function approvalCard(analysis) {
       if (analysis.policy.decision !== "human_review") return null;
 
@@ -791,6 +825,9 @@
         item.className = "event";
         item.appendChild(text("strong", event.event_type));
         item.appendChild(text("span", new Date(event.occurred_at).toLocaleString()));
+        if (event.details && event.details.trace_id) {
+          item.appendChild(text("span", "Trace " + event.details.trace_id));
+        }
         audit.appendChild(item);
       });
 
@@ -803,6 +840,7 @@
       results.appendChild(contextCard(analysis));
       results.appendChild(policyCard(analysis));
       results.appendChild(narrativeCard(analysis));
+      results.appendChild(telemetryCard(analysis));
 
       const approvals = await approvalCard(analysis);
       if (approvals) results.appendChild(approvals);

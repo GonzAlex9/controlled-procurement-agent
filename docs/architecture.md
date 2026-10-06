@@ -46,6 +46,12 @@ Approval thresholds, blocked vendors, quote requirements and security gates are 
 
 The LLM is therefore used only where ambiguity and interpretation are useful.
 
+## Observability boundary
+
+Each analysis receives a unique trace ID and records policy, analyst and total execution latency. The trace ID is mirrored into the business audit event so runtime behavior can be correlated with the authoritative workflow history.
+
+This telemetry is deliberately provider-neutral. A production adapter could export the same trace context to OpenTelemetry without making the procurement domain depend on a monitoring vendor.
+
 ## State
 
 The demo uses an in-memory store to remain easy to run. In a production design this boundary would be replaced with repositories backed by an ERP/database and an append-only or durable audit system.

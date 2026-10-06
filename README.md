@@ -229,6 +229,8 @@ The next layer evaluates model behavior on:
 
 `grounding` · `policy fidelity` · `action safety` · `risk recall` · `clarity` · `latency` · `cost`
 
+Every analysis also emits **provider-neutral execution telemetry**: trace ID, policy latency, analyst latency, total latency, finding count and approval count. The trace ID is copied into the audit event for correlation.
+
 Read [`docs/evaluation.md`](./docs/evaluation.md).
 
 ## Repository structure
@@ -272,11 +274,12 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [x] Deterministic regression evals
 - [x] CI pipeline
 - [x] Dockerized API
+- [x] Structured workflow telemetry + audit trace correlation
 - [ ] Trace-based agent eval harness
 - [ ] Prompt-injection / tool-abuse eval set
 - [ ] MCP façade for selected read-only enterprise tools
 - [ ] Persistent PostgreSQL repositories
-- [ ] OpenTelemetry / vendor-neutral observability
+- [ ] OpenTelemetry exporter / external observability backend
 - [x] Minimal reviewer UI
 
 ## Engineering position

@@ -43,6 +43,10 @@ def test_analyze_without_ai_is_reproducible():
     data = response.json()
     assert data["policy"]["decision"] == "auto_approve"
     assert data["analysis_mode"] == "deterministic"
+    assert data["telemetry"]["analysis_mode"] == "deterministic"
+    assert data["telemetry"]["decision"] == "auto_approve"
+    assert data["telemetry"]["trace_id"]
+    assert data["telemetry"]["total_duration_ms"] >= 0
 
 
 def test_demo_config_exposes_ai_capability_flag():

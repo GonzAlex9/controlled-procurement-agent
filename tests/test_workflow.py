@@ -58,3 +58,30 @@ def test_rejection_closes_gate_immediately():
         "PR-301", ApprovalAction(role=ApprovalRole.MANAGER, actor="manager@example", approved=False)
     )
     assert result.status == ApprovalStatus.REJECTED
+
+
+@pytest.mark.asyncio
+async def test_analysis_telemetry_is_correlated_with_audit_event():
+    store = DemoEnterpriseStore()
+    workflow = ProcurementWorkflow(store)
+    request = PurchaseRequest(
+        id="PR-TRACE-1",
+        requester="alex",
+        department="IT",
+        category="hardware",
+        vendor_id="vendor-cloud",
+        amount_eur=800,
+        justification="Replacement equipment for engineering workstation.",
+        quotes_count=1,
+    )
+
+    analysis = await workflow.analyze(request)
+    event = store.events_for(request.id)[0]
+
+    assert analysis.telemetry.trace_id
+    assert analysis.telemetry.analysis_mode == "deterministic"
+    assert analysis.telemetry.decision == analysis.policy.decision
+    assert analysis.telemetry.total_duration_ms >= 0
+    assert analysis.telemetry.findings_count == len(analysis.policy.findings)
+    assert event.details["trace_id"] == analysis.telemetry.trace_id
+    assert event.details["timings_ms"]["total"] == analysis.telemetry.total_duration_ms

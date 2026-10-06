@@ -90,6 +90,17 @@ class AgentNarrative(BaseModel):
     next_step: str
 
 
+class AnalysisTelemetry(BaseModel):
+    trace_id: str
+    analysis_mode: str
+    decision: Decision
+    policy_duration_ms: float = Field(ge=0)
+    analyst_duration_ms: float = Field(ge=0)
+    total_duration_ms: float = Field(ge=0)
+    findings_count: int = Field(ge=0)
+    required_approvals_count: int = Field(ge=0)
+
+
 class ProcurementAnalysis(BaseModel):
     request: PurchaseRequest
     vendor: Vendor | None
@@ -97,6 +108,7 @@ class ProcurementAnalysis(BaseModel):
     policy: PolicyAssessment
     narrative: AgentNarrative
     analysis_mode: str
+    telemetry: AnalysisTelemetry
 
 
 class ApprovalAction(BaseModel):
