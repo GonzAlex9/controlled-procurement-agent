@@ -1,7 +1,7 @@
 .PHONY: install test lint run mcp-run mcp-http eval eval-policy eval-agent eval-agent-ai eval-security eval-security-ai
 
 install:
-	python -m pip install -e ".[dev,ai,observability,mcp]"
+	python -m pip install -e ".[dev,ai,observability,mcp,postgres]"
 
 test:
 	pytest -q
