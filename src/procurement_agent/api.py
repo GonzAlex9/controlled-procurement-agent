@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Annotated
 
@@ -44,6 +45,11 @@ def demo() -> HTMLResponse:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/v1/demo/config", include_in_schema=False)
+def demo_config() -> dict[str, bool]:
+    return {"ai_enabled": bool(os.getenv("OPENAI_API_KEY"))}
 
 
 @app.post("/v1/purchase-requests/analyze", response_model=ProcurementAnalysis)
