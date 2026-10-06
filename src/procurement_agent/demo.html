@@ -699,7 +699,9 @@
       renderList(
         card,
         analysis.policy.required_approvals,
-        "No human approval required."
+        analysis.policy.decision === "reject"
+          ? "None — a blocking policy finding stops the workflow before approval."
+          : "No human approval required."
       );
 
       return card;
