@@ -23,7 +23,7 @@ A purchase request enters the system. An AI analyst can inspect read-only enterp
 
 Run the workflow in your browser with fictional enterprise data. No API key or setup required.
 
-**23/23 automated tests · 5/5 deterministic regression evals · 25/25 analyst behavior checks · 42/42 adversarial security checks · CI passing**
+**26/26 automated tests · 5/5 deterministic regression evals · 25/25 analyst behavior checks · 42/42 adversarial security checks · CI passing**
 
 This project is intentionally designed around a real enterprise concern: how to get value from agentic AI **without turning probabilistic model behavior into business authority**.
 
@@ -131,7 +131,7 @@ The public demo intentionally runs without a paid model key. AI-assisted analysi
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev,ai,observability,mcp]"
+pip install -e ".[dev,ai,observability,mcp,postgres]"
 ```
 
 ### 2. Run tests and deterministic evals
@@ -219,6 +219,21 @@ It exposes exactly two typed tools:
 
 Both are explicitly annotated as read-only, non-destructive and idempotent. The MCP surface deliberately contains no approval, vendor-mutation, budget-reservation or purchase-execution tool.
 
+### 8. Optional PostgreSQL persistence
+
+The public demo remains zero-configuration and in-memory. Set `DATABASE_URL` to switch workflow-owned mutable state to PostgreSQL:
+
+```bash
+export DATABASE_URL="postgresql+psycopg://user:password@localhost:5432/procurement"
+uvicorn procurement_agent.api:app --reload
+```
+
+Approval gates, approval history and audit events then survive process restarts. Approval mutations are transactional and lock the gate row before updating state.
+
+GitHub Actions validates this against a real PostgreSQL service by writing state through one repository instance and reading it back through another.
+
+See [`docs/persistence.md`](./docs/persistence.md).
+
 ## Interactive demo
 
 The built-in reviewer UI lets you run three representative scenarios without any frontend setup:
@@ -287,13 +302,15 @@ controlled-procurement-agent/
 │   ├── models.py         # typed contracts
 │   ├── observability.py  # optional OpenTelemetry / OTLP adapter
 │   ├── policy.py         # authoritative deterministic rules
-│   ├── store.py          # fictional enterprise context + approval state
+│   ├── postgres_store.py # durable approval + audit repository
+│   ├── store.py          # store protocol + in-memory implementation
 │   └── workflow.py       # orchestration boundary
 ├── tests/                # deterministic unit/integration tests
 ├── evals/                # regression dataset + eval runner
 ├── docs/
 │   ├── architecture.md
 │   ├── evaluation.md
+│   ├── persistence.md
 │   └── security.md
 ├── .github/workflows/ci.yml
 ├── Dockerfile
@@ -304,7 +321,7 @@ controlled-procurement-agent/
 
 This is deliberately **not** a multi-agent swarm. One specialist with narrow tools is easier to reason about, evaluate and secure. More agents would be added only when a concrete decomposition produces measurable value.
 
-The demo uses an in-memory repository to keep the project runnable. Production integrations would sit behind explicit interfaces to ERP, IAM, vendor master, budgets and audit infrastructure.
+The public demo uses an in-memory repository to stay free and zero-configuration. Setting `DATABASE_URL` activates a PostgreSQL repository for durable approval state and audit history. Vendor and budget facts remain read-only demo adapters because real deployments would source them from ERP, finance and vendor-master systems.
 
 There is also intentionally no RAG layer yet. Retrieval should be introduced when the workflow actually needs policy/document knowledge that cannot be represented as deterministic rules or direct enterprise data.
 
@@ -323,7 +340,7 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [x] Trace-based agent eval harness
 - [x] Prompt-injection / tool-abuse eval set
 - [x] MCP façade for selected read-only enterprise tools
-- [ ] Persistent PostgreSQL repositories
+- [x] Persistent PostgreSQL workflow repository
 - [x] OpenTelemetry OTLP exporter / vendor-neutral observability
 - [x] Minimal reviewer UI
 
