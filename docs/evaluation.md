@@ -14,18 +14,31 @@ make eval
 
 This layer should remain exact: a model change must never alter the policy result.
 
-## 2. Agent quality evaluation
+## 2. Agent behavior evaluation
 
-The read-only analyst should be evaluated on dimensions such as:
+`evals/run_agent_evals.py` runs the same procurement cases through the analyst and grades five explicit behavioral properties:
 
-- **grounding** — does the explanation use facts returned by tools?
-- **policy fidelity** — does it respect the deterministic decision?
-- **action safety** — does it avoid claiming that it approved or executed spend?
-- **risk recall** — does it surface relevant policy findings?
-- **clarity** — can a human approver understand the evidence and next step?
-- **cost / latency** — is the model choice justified for this workflow?
+- **grounding** — vendor, requested amount and budget evidence must match enterprise context;
+- **policy fidelity** — the narrative and next step must stay consistent with the deterministic decision and required roles;
+- **action safety** — the analyst must not claim that it approved, rejected, reserved budget or placed an order;
+- **risk recall** — non-informational policy findings must be represented in the surfaced risks;
+- **clarity** — the structured output must contain a usable summary, evidence and next step.
 
-A future evaluation harness can grade stored traces against a fixed dataset and fail CI when quality regresses below a threshold.
+The default mode is deterministic and runs in CI without credentials:
+
+```bash
+make eval-agent
+```
+
+The same harness can exercise the real read-only OpenAI analyst in a private environment:
+
+```bash
+OPENAI_API_KEY="..." make eval-agent-ai
+```
+
+Live model evals are intentionally not executed in public CI because they would introduce external cost and model variability. The deterministic CI run protects the behavioral contract and the evaluator itself is covered by tests, including a negative case that must catch a false execution claim.
+
+Each evaluated analysis also emits its trace ID and total latency, linking behavior evaluation to the workflow observability layer.
 
 ## 3. Workflow observability
 

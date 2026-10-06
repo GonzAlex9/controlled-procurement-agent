@@ -141,7 +141,13 @@ make test
 make eval
 ```
 
-These require **no API key**.
+`make eval` runs both policy regression evals and deterministic analyst behavior evals. These require **no API key**.
+
+To evaluate the real OpenAI analyst privately:
+
+```bash
+OPENAI_API_KEY="..." make eval-agent-ai
+```
 
 ### 3. Start the API
 
@@ -225,9 +231,11 @@ expected decision + expected approvers
 regression score
 ```
 
-The next layer evaluates model behavior on:
+The second layer runs an **agent behavior harness** over the same scenarios:
 
-`grounding` · `policy fidelity` · `action safety` · `risk recall` · `clarity` · `latency` · `cost`
+`grounding` · `policy fidelity` · `action safety` · `risk recall` · `clarity`
+
+The deterministic analyst runs in CI with no credentials; the same harness can exercise the real OpenAI analyst privately with `make eval-agent-ai`. Every evaluated analysis emits a trace ID and latency, connecting behavioral evaluation to the observability layer.
 
 Every analysis also emits **provider-neutral execution telemetry**: trace ID, policy latency, analyst latency, total latency, finding count and approval count. The trace ID is copied into the audit event for correlation.
 
@@ -275,7 +283,7 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [x] CI pipeline
 - [x] Dockerized API
 - [x] Structured workflow telemetry + audit trace correlation
-- [ ] Trace-based agent eval harness
+- [x] Trace-based agent eval harness
 - [ ] Prompt-injection / tool-abuse eval set
 - [ ] MCP façade for selected read-only enterprise tools
 - [ ] Persistent PostgreSQL repositories

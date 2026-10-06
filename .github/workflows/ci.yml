@@ -25,3 +25,5 @@ jobs:
         run: pytest -q
       - name: Policy evals
         run: PYTHONPATH=src python evals/run_policy_evals.py
+      - name: Agent behavior evals
+        run: PYTHONPATH=src python evals/run_agent_evals.py --mode deterministic
