@@ -14,7 +14,7 @@ from procurement_agent.models import (
     PurchaseRequest,
 )
 from procurement_agent.policy import ProcurementPolicyEngine
-from procurement_agent.store import DemoEnterpriseStore
+from procurement_agent.store import EnterpriseStore
 
 tracer = trace.get_tracer("procurement_agent.workflow")
 
@@ -22,7 +22,7 @@ tracer = trace.get_tracer("procurement_agent.workflow")
 class ProcurementWorkflow:
     def __init__(
         self,
-        store: DemoEnterpriseStore,
+        store: EnterpriseStore,
         policy: ProcurementPolicyEngine | None = None,
     ) -> None:
         self.store = store
