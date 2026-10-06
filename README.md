@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-API-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/OpenAI-Agents_SDK-111827?style=flat-square&logo=openai&logoColor=white" alt="OpenAI Agents SDK" />
-  <img src="https://img.shields.io/badge/Pattern-Human--in--the--Loop-6D28D9?style=flat-square" alt="Human in the loop" />
+  <img src="https://img.shields.io/badge/Pattern-Human--in--the--Loop-6D28D9?style=flat-square" alt="Human in the loop" />\n  <a href="https://render.com/deploy?repo=https://github.com/GonzAlex9/controlled-procurement-agent"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" /></a>
 </p>
 
 # Controlled Procurement Agent
@@ -99,6 +99,20 @@ Examples:
 - blocked vendor or exceeded budget → reject.
 
 See [`src/procurement_agent/policy.py`](./src/procurement_agent/policy.py).
+
+## Deployment
+
+The repository includes a `render.yaml` Blueprint for a reproducible public deployment:
+
+- Python 3.12
+- Frankfurt region
+- `/health` health check
+- auto-deploy only after GitHub CI checks pass
+- no OpenAI API key required for the public deterministic demo
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/GonzAlex9/controlled-procurement-agent)
+
+The public demo intentionally runs without a paid model key. AI-assisted analysis can still be enabled in a private deployment by setting `OPENAI_API_KEY`.
 
 ## Run locally
 
