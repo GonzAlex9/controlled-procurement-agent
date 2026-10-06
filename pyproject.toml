@@ -27,6 +27,10 @@ observability = [
 mcp = [
   "mcp>=2,<3",
 ]
+postgres = [
+  "psycopg[binary]>=3.2,<4",
+  "sqlalchemy>=2.0.54,<3",
+]
 dev = [
   "httpx>=0.28,<1",
   "pytest>=8.3,<9",
