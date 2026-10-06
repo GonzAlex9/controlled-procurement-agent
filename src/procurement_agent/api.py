@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from procurement_agent.analyst import OpenAIAgentAnalyst
 from procurement_agent.models import (
@@ -26,6 +28,17 @@ app = FastAPI(
 
 store = DemoEnterpriseStore()
 workflow = ProcurementWorkflow(store)
+DEMO_HTML = Path(__file__).with_name("demo.html").read_text(encoding="utf-8")
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse(url="/demo")
+
+
+@app.get("/demo", response_class=HTMLResponse, include_in_schema=False)
+def demo() -> HTMLResponse:
+    return HTMLResponse(DEMO_HTML)
 
 
 @app.get("/health")
