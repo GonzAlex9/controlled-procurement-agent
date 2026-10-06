@@ -1,0 +1,37 @@
+from fastapi.testclient import TestClient
+
+from procurement_agent.api import app, store
+
+client = TestClient(app)
+
+
+def setup_function():
+    store.approvals.clear()
+    store.audit_events.clear()
+
+
+def test_health():
+    assert client.get("/health").json() == {"status": "ok"}
+
+
+def test_analyze_without_ai_is_reproducible():
+    response = client.post(
+        "/v1/purchase-requests/analyze",
+        json={
+            "id": "PR-API-1",
+            "requester": "demo.user",
+            "department": "IT",
+            "category": "hardware",
+            "vendor_id": "vendor-cloud",
+            "amount_eur": 700,
+            "justification": "Replacement monitor for engineering workstation.",
+            "quotes_count": 1,
+            "contains_personal_data": False,
+            "recurring": False,
+            "emergency": False,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["policy"]["decision"] == "auto_approve"
+    assert data["analysis_mode"] == "deterministic"
