@@ -23,7 +23,7 @@ A purchase request enters the system. An AI analyst can inspect read-only enterp
 
 Run the workflow in your browser with fictional enterprise data. No API key or setup required.
 
-**19/19 automated tests · 5/5 deterministic regression evals · 25/25 analyst behavior checks · 42/42 adversarial security checks · CI passing**
+**21/21 automated tests · 5/5 deterministic regression evals · 25/25 analyst behavior checks · 42/42 adversarial security checks · CI passing**
 
 This project is intentionally designed around a real enterprise concern: how to get value from agentic AI **without turning probabilistic model behavior into business authority**.
 
