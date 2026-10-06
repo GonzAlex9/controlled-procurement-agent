@@ -131,7 +131,7 @@ The public demo intentionally runs without a paid model key. AI-assisted analysi
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev,ai]"
+pip install -e ".[dev,ai,observability]"
 ```
 
 ### 2. Run tests and deterministic evals
@@ -189,6 +189,15 @@ Then call the same endpoint with `?use_ai=true`.
 
 AI mode uses the **OpenAI Agents SDK** with read-only tools and structured output. SDK tracing can be used to inspect model calls and tool use.
 
+### 6. Optional OTLP tracing
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4318"
+export OTEL_SERVICE_NAME="controlled-procurement-agent"
+```
+
+Restart the API and it will export batched OpenTelemetry traces over OTLP/HTTP. FastAPI requests are instrumented automatically, while custom procurement spans include only control-plane metadata — never request justification, prompts, credentials or enterprise payloads.
+
 ## Interactive demo
 
 The built-in reviewer UI lets you run three representative scenarios without any frontend setup:
@@ -242,6 +251,8 @@ The third layer is adversarial: prompt injection, authority impersonation, fake 
 
 Every analysis also emits **provider-neutral execution telemetry**: trace ID, policy latency, analyst latency, total latency, finding count and approval count. The trace ID is copied into the audit event for correlation.
 
+The workflow additionally emits **OpenTelemetry spans** for the analysis, policy and analyst stages. OTLP/HTTP export is opt-in through standard `OTEL_*` environment variables, so a private deployment can send traces to an OpenTelemetry Collector or compatible backend without changing domain code.
+
 Read [`docs/evaluation.md`](./docs/evaluation.md).
 
 ## Repository structure
@@ -252,6 +263,7 @@ controlled-procurement-agent/
 │   ├── analyst.py        # deterministic + OpenAI agent analyst
 │   ├── api.py            # FastAPI surface
 │   ├── models.py         # typed contracts
+│   ├── observability.py  # optional OpenTelemetry / OTLP adapter
 │   ├── policy.py         # authoritative deterministic rules
 │   ├── store.py          # fictional enterprise context + approval state
 │   └── workflow.py       # orchestration boundary
@@ -290,7 +302,7 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [x] Prompt-injection / tool-abuse eval set
 - [ ] MCP façade for selected read-only enterprise tools
 - [ ] Persistent PostgreSQL repositories
-- [ ] OpenTelemetry exporter / external observability backend
+- [x] OpenTelemetry OTLP exporter / vendor-neutral observability
 - [x] Minimal reviewer UI
 
 ## Engineering position

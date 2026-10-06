@@ -15,6 +15,7 @@ from procurement_agent.models import (
     ProcurementAnalysis,
     PurchaseRequest,
 )
+from procurement_agent.observability import configure_observability
 from procurement_agent.store import DemoEnterpriseStore
 from procurement_agent.workflow import ProcurementWorkflow
 
@@ -26,6 +27,7 @@ app = FastAPI(
         "and explicit human approval. All enterprise data is fictional demo data."
     ),
 )
+OBSERVABILITY_ENABLED = configure_observability(app)
 
 store = DemoEnterpriseStore()
 workflow = ProcurementWorkflow(store)
@@ -59,7 +61,10 @@ def health_head() -> Response:
 
 @app.get("/v1/demo/config", include_in_schema=False)
 def demo_config() -> dict[str, bool]:
-    return {"ai_enabled": bool(os.getenv("OPENAI_API_KEY"))}
+    return {
+        "ai_enabled": bool(os.getenv("OPENAI_API_KEY")),
+        "observability_enabled": OBSERVABILITY_ENABLED,
+    }
 
 
 @app.post("/v1/purchase-requests/analyze", response_model=ProcurementAnalysis)

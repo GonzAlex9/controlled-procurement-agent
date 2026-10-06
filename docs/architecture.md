@@ -48,9 +48,17 @@ The LLM is therefore used only where ambiguity and interpretation are useful.
 
 ## Observability boundary
 
-Each analysis receives a unique trace ID and records policy, analyst and total execution latency. The trace ID is mirrored into the business audit event so runtime behavior can be correlated with the authoritative workflow history.
+Each analysis receives a unique application trace ID and records policy, analyst and total execution latency. The trace ID is mirrored into the business audit event so runtime behavior can be correlated with the authoritative workflow history.
 
-This telemetry is deliberately provider-neutral. A production adapter could export the same trace context to OpenTelemetry without making the procurement domain depend on a monitoring vendor.
+The workflow also emits OpenTelemetry spans through the vendor-neutral API:
+
+- `procurement.analyze`;
+- `procurement.policy.evaluate`;
+- `procurement.analyst.generate`.
+
+Only control-plane metadata is attached to spans: trace correlation, analysis mode, decision and aggregate counts. Request justification, actor identity, prompts and enterprise payloads are deliberately excluded from custom span attributes.
+
+OTLP export is optional. When an `OTEL_EXPORTER_OTLP_ENDPOINT` or `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is configured and the `observability` extra is installed, the app initializes an OpenTelemetry SDK tracer provider, batches spans to an OTLP/HTTP exporter and instruments FastAPI requests. Without an endpoint, the OpenTelemetry API remains a no-op and the public demo has no external telemetry dependency.
 
 ## State
 

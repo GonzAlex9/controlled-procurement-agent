@@ -74,9 +74,21 @@ The same `trace_id` is written into the `procurement.analysis.completed` audit e
 
 The public demo renders this telemetry directly so the execution path is inspectable without external infrastructure.
 
-## 5. Production monitoring
+## 5. OpenTelemetry export
 
-A production version should export the same trace context to OpenTelemetry or another vendor-neutral telemetry pipeline and combine offline evals with trace-level monitoring for:
+The workflow emits vendor-neutral OpenTelemetry spans even when no exporter is configured. In a deployment with the `observability` extra installed, setting an OTLP endpoint enables batched OTLP/HTTP export and FastAPI request instrumentation.
+
+Example:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4318"
+export OTEL_SERVICE_NAME="controlled-procurement-agent"
+uvicorn procurement_agent.api:app
+```
+
+The exporter intentionally carries control-plane metadata rather than request bodies, justifications, prompts or credentials.
+
+A production telemetry backend can then combine offline evals with trace-level monitoring for:
 
 - tool errors;
 - approval bypass attempts;
