@@ -1,7 +1,7 @@
-.PHONY: install test lint run eval eval-policy eval-agent eval-agent-ai eval-security eval-security-ai
+.PHONY: install test lint run mcp-run mcp-http eval eval-policy eval-agent eval-agent-ai eval-security eval-security-ai
 
 install:
-	python -m pip install -e ".[dev,ai]"
+	python -m pip install -e ".[dev,ai,observability,mcp]"
 
 test:
 	pytest -q
@@ -11,6 +11,12 @@ lint:
 
 run:
 	uvicorn procurement_agent.api:app --reload
+
+mcp-run:
+	python -m procurement_agent.mcp_server
+
+mcp-http:
+	MCP_TRANSPORT=streamable-http python -m procurement_agent.mcp_server
 
 eval: eval-policy eval-agent eval-security
 

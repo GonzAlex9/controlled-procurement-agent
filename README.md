@@ -131,7 +131,7 @@ The public demo intentionally runs without a paid model key. AI-assisted analysi
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev,ai,observability]"
+pip install -e ".[dev,ai,observability,mcp]"
 ```
 
 ### 2. Run tests and deterministic evals
@@ -198,6 +198,27 @@ export OTEL_SERVICE_NAME="controlled-procurement-agent"
 
 Restart the API and it will export batched OpenTelemetry traces over OTLP/HTTP. FastAPI requests are instrumented automatically, while custom procurement spans include only control-plane metadata — never request justification, prompts, credentials or enterprise payloads.
 
+### 7. MCP read-only enterprise context
+
+Run the MCP façade over stdio:
+
+```bash
+make mcp-run
+```
+
+Or run it as a stateless Streamable HTTP service for a separately secured deployment:
+
+```bash
+make mcp-http
+```
+
+It exposes exactly two typed tools:
+
+- `procurement_lookup_vendor`;
+- `procurement_lookup_budget`.
+
+Both are explicitly annotated as read-only, non-destructive and idempotent. The MCP surface deliberately contains no approval, vendor-mutation, budget-reservation or purchase-execution tool.
+
 ## Interactive demo
 
 The built-in reviewer UI lets you run three representative scenarios without any frontend setup:
@@ -262,6 +283,7 @@ controlled-procurement-agent/
 ├── src/procurement_agent/
 │   ├── analyst.py        # deterministic + OpenAI agent analyst
 │   ├── api.py            # FastAPI surface
+│   ├── mcp_server.py     # read-only MCP enterprise-context façade
 │   ├── models.py         # typed contracts
 │   ├── observability.py  # optional OpenTelemetry / OTLP adapter
 │   ├── policy.py         # authoritative deterministic rules
@@ -300,7 +322,7 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [x] Structured workflow telemetry + audit trace correlation
 - [x] Trace-based agent eval harness
 - [x] Prompt-injection / tool-abuse eval set
-- [ ] MCP façade for selected read-only enterprise tools
+- [x] MCP façade for selected read-only enterprise tools
 - [ ] Persistent PostgreSQL repositories
 - [x] OpenTelemetry OTLP exporter / vendor-neutral observability
 - [x] Minimal reviewer UI

@@ -18,7 +18,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install
-        run: python -m pip install -e ".[dev,observability]"
+        run: python -m pip install -e ".[dev,observability,mcp]"
       - name: Lint
         run: ruff check .
       - name: Tests

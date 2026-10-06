@@ -24,6 +24,9 @@ observability = [
   "opentelemetry-instrumentation-fastapi>=0.65b0,<1",
   "opentelemetry-sdk>=1.44,<2",
 ]
+mcp = [
+  "mcp>=2,<3",
+]
 dev = [
   "httpx>=0.28,<1",
   "pytest>=8.3,<9",

@@ -50,6 +50,12 @@ The agent still receives only read-only vendor and budget tools. Security theref
 
 A production version should additionally include strict tool schemas, content provenance, authorization at tool execution time, output validation and state-dependent tool allowlists.
 
+## MCP least-privilege boundary
+
+The optional MCP façade exposes exactly two enterprise-context tools: vendor lookup and budget lookup. Both are marked read-only, non-destructive, idempotent and closed-world.
+
+The server does **not** publish tools for approvals, vendor mutation, budget reservation or purchase execution. A remote production deployment would additionally require authentication and tenant-aware authorization at the repository boundary; the public demo does not expose the MCP endpoint.
+
 ## Data isolation
 
 Production enterprise data should be scoped by tenant and caller identity at the repository/tool layer, not by natural-language model instructions.

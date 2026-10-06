@@ -60,6 +60,21 @@ Only control-plane metadata is attached to spans: trace correlation, analysis mo
 
 OTLP export is optional. When an `OTEL_EXPORTER_OTLP_ENDPOINT` or `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is configured and the `observability` extra is installed, the app initializes an OpenTelemetry SDK tracer provider, batches spans to an OTLP/HTTP exporter and instruments FastAPI requests. Without an endpoint, the OpenTelemetry API remains a no-op and the public demo has no external telemetry dependency.
 
+## MCP enterprise-context façade
+
+The same vendor and budget boundary is exposed through a separate MCP server using the official Python SDK v2.
+
+It deliberately publishes only:
+
+- `procurement_lookup_vendor`;
+- `procurement_lookup_budget`.
+
+Both tools are typed, structured, idempotent and explicitly annotated as read-only/non-destructive. No approval, budget-reservation, vendor-mutation or purchase-execution capability exists in the MCP server.
+
+The façade can run over stdio for local MCP hosts or stateless Streamable HTTP with JSON responses for a separately secured remote deployment. It is intentionally not exposed by the public portfolio demo.
+
+This keeps the integration boundary reusable: the internal OpenAI analyst may use direct adapters, while another MCP-compatible agent can consume the same enterprise context without receiving business authority.
+
 ## State
 
 The demo uses an in-memory store to remain easy to run. In a production design this boundary would be replaced with repositories backed by an ERP/database and an append-only or durable audit system.
