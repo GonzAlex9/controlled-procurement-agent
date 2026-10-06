@@ -75,9 +75,15 @@ The façade can run over stdio for local MCP hosts or stateless Streamable HTTP 
 
 This keeps the integration boundary reusable: the internal OpenAI analyst may use direct adapters, while another MCP-compatible agent can consume the same enterprise context without receiving business authority.
 
-## State
+## State and persistence
 
-The demo uses an in-memory store to remain easy to run. In a production design this boundary would be replaced with repositories backed by an ERP/database and an append-only or durable audit system.
+The workflow depends on an `EnterpriseStore` protocol rather than a concrete database.
+
+The public demo defaults to `DemoEnterpriseStore` for zero-configuration execution. When `DATABASE_URL` is configured, `PostgresEnterpriseStore` persists approval gates, approval history and audit events. Approval mutations lock the gate row inside a transaction before updating it, preventing concurrent approvals from overwriting each other.
+
+Vendor and budget facts remain read-only demo reference data. In a real enterprise deployment those reads would normally be adapters to ERP, finance and vendor-master systems, while this service would own only its workflow state.
+
+See `docs/persistence.md` for the persistence model and CI integration-test strategy.
 
 ## Agent runtime
 
