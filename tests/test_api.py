@@ -42,3 +42,9 @@ def test_analyze_without_ai_is_reproducible():
     data = response.json()
     assert data["policy"]["decision"] == "auto_approve"
     assert data["analysis_mode"] == "deterministic"
+
+
+def test_demo_config_exposes_ai_capability_flag():
+    response = client.get("/v1/demo/config")
+    assert response.status_code == 200
+    assert isinstance(response.json()["ai_enabled"], bool)
