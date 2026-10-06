@@ -511,7 +511,7 @@
             <label><input id="personal-data" type="checkbox" checked /> Personal data</label>
             <label><input id="recurring" type="checkbox" /> Recurring spend</label>
             <label><input id="emergency" type="checkbox" /> Emergency</label>
-            <label><input id="use-ai" type="checkbox" /> Use OpenAI analyst</label>
+            <label><input id="use-ai" type="checkbox" /> <span id="ai-label">Use OpenAI analyst</span></label>
           </div>
 
           <button class="primary" id="analyze" type="submit">Analyze purchase request</button>
@@ -818,6 +818,23 @@
       errorBox.textContent = "";
       errorBox.style.display = "none";
     }
+
+    async function configureAiMode() {
+      try {
+        const config = await fetchJson("/v1/demo/config");
+        const checkbox = document.getElementById("use-ai");
+        const label = document.getElementById("ai-label");
+        if (!config.ai_enabled) {
+          checkbox.checked = false;
+          checkbox.disabled = true;
+          label.textContent = "OpenAI analyst disabled in public demo";
+        }
+      } catch (_) {
+        document.getElementById("use-ai").disabled = true;
+      }
+    }
+
+    configureAiMode();
 
     document.querySelectorAll("[data-preset]").forEach((button) => {
       button.addEventListener("click", () => {
