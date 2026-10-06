@@ -14,6 +14,11 @@ def test_health():
     assert client.get("/health").json() == {"status": "ok"}
 
 
+def test_render_head_probes_are_supported():
+    assert client.head("/").status_code == 200
+    assert client.head("/health").status_code == 200
+
+
 def test_demo_ui_is_available():
     response = client.get("/demo")
     assert response.status_code == 200
