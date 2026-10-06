@@ -66,3 +66,17 @@ def test_budget_overrun_rejects():
     )
     assert result.decision == Decision.REJECT
     assert any(f.code == "BUDGET_EXCEEDED" for f in result.findings)
+
+
+def test_blocking_finding_suppresses_review_path():
+    store = DemoEnterpriseStore()
+    request = make_request(vendor_id="vendor-legacy")
+    result = ProcurementPolicyEngine().evaluate(
+        request, store.get_vendor(request.vendor_id), store.get_budget(request.department)
+    )
+
+    high_risk = next(f for f in result.findings if f.code == "HIGH_RISK_VENDOR")
+
+    assert result.decision == Decision.REJECT
+    assert result.required_approvals == []
+    assert "blocking finding stops the workflow before approval" in high_risk.message
