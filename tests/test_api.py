@@ -14,6 +14,13 @@ def test_health():
     assert client.get("/health").json() == {"status": "ok"}
 
 
+def test_demo_ui_is_available():
+    response = client.get("/demo")
+    assert response.status_code == 200
+    assert "Controlled Procurement Agent" in response.text
+    assert "Analyze purchase request" in response.text
+
+
 def test_analyze_without_ai_is_reproducible():
     response = client.post(
         "/v1/purchase-requests/analyze",
