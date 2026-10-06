@@ -148,6 +148,20 @@ class ProcurementPolicyEngine:
         if blocking:
             decision = Decision.REJECT
             approvals = []
+            findings = [
+                PolicyFinding(
+                    code=finding.code,
+                    message=(
+                        "Normally: "
+                        + finding.message
+                        + " A blocking finding stops the workflow before approval."
+                        if finding.severity == FindingSeverity.WARNING
+                        else finding.message
+                    ),
+                    severity=finding.severity,
+                )
+                for finding in findings
+            ]
         elif approvals:
             decision = Decision.HUMAN_REVIEW
         else:
