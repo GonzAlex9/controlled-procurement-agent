@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+from typing import Protocol
+
 from procurement_agent.models import (
     ApprovalAction,
     ApprovalRecord,
@@ -13,8 +16,36 @@ from procurement_agent.models import (
 )
 
 
+class EnterpriseStore(Protocol):
+    persistent: bool
+
+    def get_vendor(self, vendor_id: str) -> Vendor | None: ...
+
+    def get_budget(self, department: str) -> Budget | None: ...
+
+    def create_approval_gate(
+        self,
+        request_id: str,
+        required: list[ApprovalRole],
+    ) -> ApprovalRecord: ...
+
+    def get_approval(self, request_id: str) -> ApprovalRecord | None: ...
+
+    def record_approval(
+        self,
+        request_id: str,
+        action: ApprovalAction,
+    ) -> ApprovalRecord: ...
+
+    def append_event(self, event: AuditEvent) -> None: ...
+
+    def events_for(self, request_id: str) -> list[AuditEvent]: ...
+
+
 class DemoEnterpriseStore:
     """In-memory enterprise context for a safe, reproducible portfolio demo."""
+
+    persistent = False
 
     def __init__(self) -> None:
         self.vendors = {
@@ -52,14 +83,19 @@ class DemoEnterpriseStore:
         return self.budgets.get(department)
 
     def create_approval_gate(
-        self, request_id: str, required: list[ApprovalRole]
+        self,
+        request_id: str,
+        required: list[ApprovalRole],
     ) -> ApprovalRecord:
         record = ApprovalRecord(request_id=request_id, required=required)
         self.approvals[request_id] = record
         return record
 
+    def get_approval(self, request_id: str) -> ApprovalRecord | None:
+        return self.approvals.get(request_id)
+
     def record_approval(self, request_id: str, action: ApprovalAction) -> ApprovalRecord:
-        record = self.approvals.get(request_id)
+        record = self.get_approval(request_id)
         if record is None:
             raise KeyError(f"No approval gate exists for request {request_id}")
         if record.status != ApprovalStatus.PENDING:
@@ -83,3 +119,18 @@ class DemoEnterpriseStore:
 
     def events_for(self, request_id: str) -> list[AuditEvent]:
         return [event for event in self.audit_events if event.request_id == request_id]
+
+
+def build_enterprise_store(database_url: str | None = None) -> EnterpriseStore:
+    url = database_url if database_url is not None else os.getenv("DATABASE_URL")
+    if not url:
+        return DemoEnterpriseStore()
+
+    try:
+        from procurement_agent.postgres_store import PostgresEnterpriseStore
+    except ImportError as exc:  # pragma: no cover - optional dependency boundary
+        raise RuntimeError(
+            'PostgreSQL mode requires: pip install -e ".[postgres]"'
+        ) from exc
+
+    return PostgresEnterpriseStore(url)
