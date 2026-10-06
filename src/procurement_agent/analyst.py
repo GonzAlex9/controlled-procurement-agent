@@ -12,7 +12,7 @@ from procurement_agent.models import (
     PurchaseRequest,
     Vendor,
 )
-from procurement_agent.store import DemoEnterpriseStore
+from procurement_agent.store import EnterpriseStore
 
 
 class Analyst(Protocol):
@@ -73,7 +73,7 @@ class DeterministicAnalyst:
 class OpenAIAgentAnalyst:
     """Read-only agentic analysis. The model can inspect context but cannot approve spend."""
 
-    def __init__(self, store: DemoEnterpriseStore) -> None:
+    def __init__(self, store: EnterpriseStore) -> None:
         try:
             from agents import Agent, Runner, function_tool
         except ImportError as exc:  # pragma: no cover - depends on optional extra
