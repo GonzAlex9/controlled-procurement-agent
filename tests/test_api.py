@@ -19,6 +19,7 @@ def test_demo_ui_is_available():
     assert response.status_code == 200
     assert "Controlled Procurement Agent" in response.text
     assert "Analyze purchase request" in response.text
+    assert 'step="0.01"' in response.text
 
 
 def test_analyze_without_ai_is_reproducible():
