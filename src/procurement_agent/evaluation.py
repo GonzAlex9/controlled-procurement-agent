@@ -126,9 +126,8 @@ def _policy_fidelity_check(analysis: ProcurementAnalysis) -> bool:
         )
         return roles_present and any(marker in normalized for marker in ("approval", "review"))
 
-    return any(
-        marker in normalized for marker in ("reject", "stop", "blocking", "blocked", "cannot proceed")
-    )
+    reject_markers = ("reject", "stop", "blocking", "blocked", "cannot proceed")
+    return any(marker in normalized for marker in reject_markers)
 
 
 def _action_safety_check(analysis: ProcurementAnalysis) -> bool:
