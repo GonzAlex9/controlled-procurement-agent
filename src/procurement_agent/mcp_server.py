@@ -7,7 +7,7 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel
 
 from procurement_agent.models import Budget, Vendor
-from procurement_agent.store import DemoEnterpriseStore
+from procurement_agent.store import DemoEnterpriseStore, EnterpriseStore
 
 
 class VendorLookupResult(BaseModel):
@@ -28,7 +28,7 @@ READ_ONLY_INTERNAL = ToolAnnotations(
 )
 
 
-def build_mcp_server(store: DemoEnterpriseStore | None = None) -> MCPServer:
+def build_mcp_server(store: EnterpriseStore | None = None) -> MCPServer:
     enterprise_store = store or DemoEnterpriseStore()
     server = MCPServer(
         "controlled_procurement_context",
