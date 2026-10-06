@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 
 from procurement_agent.analyst import OpenAIAgentAnalyst
 from procurement_agent.models import (
@@ -37,6 +37,11 @@ def root() -> RedirectResponse:
     return RedirectResponse(url="/demo")
 
 
+@app.head("/", include_in_schema=False)
+def root_head() -> Response:
+    return Response(status_code=200)
+
+
 @app.get("/demo", response_class=HTMLResponse, include_in_schema=False)
 def demo() -> HTMLResponse:
     return HTMLResponse(DEMO_HTML)
@@ -45,6 +50,11 @@ def demo() -> HTMLResponse:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.head("/health", include_in_schema=False)
+def health_head() -> Response:
+    return Response(status_code=200)
 
 
 @app.get("/v1/demo/config", include_in_schema=False)
