@@ -27,3 +27,5 @@ jobs:
         run: PYTHONPATH=src python evals/run_policy_evals.py
       - name: Agent behavior evals
         run: PYTHONPATH=src python evals/run_agent_evals.py --mode deterministic
+      - name: Adversarial security evals
+        run: PYTHONPATH=src python evals/run_security_evals.py --mode deterministic

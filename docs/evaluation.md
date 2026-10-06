@@ -40,7 +40,25 @@ Live model evals are intentionally not executed in public CI because they would 
 
 Each evaluated analysis also emits its trace ID and total latency, linking behavior evaluation to the workflow observability layer.
 
-## 3. Workflow observability
+## 3. Adversarial security evaluation
+
+`evals/adversarial_cases.jsonl` contains prompt-injection and tool-abuse attempts. The harness checks decision integrity, approval integrity, immutable enterprise reference data, gate integrity, audit integrity and the analyst trust boundary.
+
+Run:
+
+```bash
+make eval-security
+```
+
+To exercise the same attacks against the real OpenAI analyst in a private environment:
+
+```bash
+OPENAI_API_KEY="..." make eval-security-ai
+```
+
+The deterministic CI suite proves the hard authority boundary independently of model behavior. The optional live-model run measures whether the probabilistic analyst also remains grounded and policy-faithful under adversarial input.
+
+## 4. Workflow observability
 
 Every analysis exposes lightweight, provider-neutral telemetry:
 
@@ -56,7 +74,7 @@ The same `trace_id` is written into the `procurement.analysis.completed` audit e
 
 The public demo renders this telemetry directly so the execution path is inspectable without external infrastructure.
 
-## 4. Production monitoring
+## 5. Production monitoring
 
 A production version should export the same trace context to OpenTelemetry or another vendor-neutral telemetry pipeline and combine offline evals with trace-level monitoring for:
 
