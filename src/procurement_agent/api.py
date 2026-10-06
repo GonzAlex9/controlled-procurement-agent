@@ -16,7 +16,7 @@ from procurement_agent.models import (
     PurchaseRequest,
 )
 from procurement_agent.observability import configure_observability
-from procurement_agent.store import DemoEnterpriseStore
+from procurement_agent.store import build_enterprise_store
 from procurement_agent.workflow import ProcurementWorkflow
 
 app = FastAPI(
@@ -29,7 +29,7 @@ app = FastAPI(
 )
 OBSERVABILITY_ENABLED = configure_observability(app)
 
-store = DemoEnterpriseStore()
+store = build_enterprise_store()
 workflow = ProcurementWorkflow(store)
 DEMO_HTML = Path(__file__).with_name("demo.html").read_text(encoding="utf-8")
 
@@ -64,6 +64,7 @@ def demo_config() -> dict[str, bool]:
     return {
         "ai_enabled": bool(os.getenv("OPENAI_API_KEY")),
         "observability_enabled": OBSERVABILITY_ENABLED,
+        "persistence_enabled": store.persistent,
     }
 
 
@@ -108,7 +109,7 @@ def submit_approval(request_id: str, action: ApprovalAction) -> ApprovalRecord:
 
 @app.get("/v1/approvals/{request_id}", response_model=ApprovalRecord)
 def get_approval(request_id: str) -> ApprovalRecord:
-    record = store.approvals.get(request_id)
+    record = store.get_approval(request_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Approval gate not found")
     return record
