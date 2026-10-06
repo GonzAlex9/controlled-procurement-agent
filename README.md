@@ -125,7 +125,7 @@ These require **no API key**.
 make run
 ```
 
-Open the FastAPI docs at `http://localhost:8000/docs`.
+Open the interactive portfolio demo at `http://localhost:8000/demo` (or simply `http://localhost:8000/`).\n\nThe FastAPI docs remain available at `http://localhost:8000/docs`.
 
 ### 4. Analyze a request without an LLM
 
@@ -156,7 +156,7 @@ Then call the same endpoint with `?use_ai=true`.
 
 AI mode uses the **OpenAI Agents SDK** with read-only tools and structured output. SDK tracing can be used to inspect model calls and tool use.
 
-## Human approval example
+## Interactive demo\n\nThe built-in reviewer UI lets you run three representative scenarios without any frontend setup:\n\n- **Low risk** — approved vendor, available budget, no human approval required.\n- **Human review** — medium-risk vendor / higher spend / personal-data handling.\n- **Policy reject** — blocked vendor or other blocking condition.\n\nThe screen exposes the full decision path: enterprise context → deterministic policy → analyst narrative → human approval gate → audit trail. Human approvers can record approvals directly from the demo UI.\n\nThe UI is intentionally self-contained HTML/CSS/JavaScript served by FastAPI so the portfolio project remains easy to run and inspect.\n\n## Human approval example
 
 If policy requires approval, the workflow creates an approval gate. A human role then records an explicit decision:
 
@@ -239,7 +239,7 @@ There is also intentionally no RAG layer yet. Retrieval should be introduced whe
 - [ ] MCP façade for selected read-only enterprise tools
 - [ ] Persistent PostgreSQL repositories
 - [ ] OpenTelemetry / vendor-neutral observability
-- [ ] Minimal reviewer UI
+- [x] Minimal reviewer UI
 
 ## Engineering position
 
